@@ -6,6 +6,8 @@ on:
       - 'docs/**'
       - 'tests/**'
       - 'scripts/stage_web_engines.py'
+      - 'scripts/build_native_wasm.sh'
+      - 'native-wasm/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 permissions:
@@ -18,6 +20,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -30,6 +33,7 @@ jobs:
         run: |
           node --test tests/*.test.mjs
           node --check docs/advanced-lab.mjs
+          node --check docs/native-worker.mjs
           node --check scripts/compare-runtime.mjs
           node --check docs/workbench.mjs
           node --check docs/recovery-worker.mjs
@@ -39,6 +43,16 @@ jobs:
           grep -q 'REAlity' docs/index.html
       - name: Stage pinned browser engines
         run: python3 scripts/stage_web_engines.py
+      - name: Compile native WASM engine and record availability
+        shell: bash
+        run: |
+          if timeout 30m bash scripts/build_native_wasm.sh; then
+            python3 -c 'import json,pathlib; p=pathlib.Path("docs/vendor/status.json"); s=json.loads(p.read_text()); s["native"]={"available":True,"version":"0.1.0"}; p.write_text(json.dumps(s,indent=2))'
+          else
+            rm -rf docs/vendor/native
+            python3 -c 'import json,pathlib; p=pathlib.Path("docs/vendor/status.json"); s=json.loads(p.read_text()); s["native"]={"available":False,"reason":"Native WASM build or tests failed; inspect the Pages workflow log"}; p.write_text(json.dumps(s,indent=2))'
+            echo "::warning::Native WASM engine did not pass build validation"
+          fi
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
