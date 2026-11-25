@@ -37,7 +37,9 @@ class RecoveryTests(unittest.TestCase):
         f=self.p/'a';f.write_bytes(b'abc');o=self.p/'out';o.mkdir()
         with self.assertRaises(FileExistsError):recover(f,o)
     def test_no_external(self):
-        f=self.p/'a.exe';f.write_bytes(b'MZ'+b'abc')
+        b=bytearray(512);b[:2]=b'MZ';struct.pack_into('<I',b,60,64);b[64:68]=b'PE\0\0';struct.pack_into('<HH',b,68,0x8664,1)
+        f=self.p/'a.exe';f.write_bytes(b)
         with patch('recovery.run_tool') as call:
-            recover(f,self.p/'out',emit=lambda _:None);call.assert_not_called()
+            r=recover(f,self.p/'out',emit=lambda _:None);call.assert_not_called()
+            self.assertTrue(r['tools']);self.assertTrue(all(x['status']=='not run (static mode)' for x in r['tools']))
 if __name__=='__main__':unittest.main()
