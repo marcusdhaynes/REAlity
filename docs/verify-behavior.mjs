@@ -1,0 +1,10 @@
+import {validateContract,contractDigest,compareEvidence} from './behavior-contract.mjs';
+const $=id=>document.getElementById(id);let report=null,busy=false;
+const example={"version":1,"cases":[{"id":"double","steps":[{"id":"enter","op":"fill","targets":{"native":{"by":"auto_id","value":"Input","controlType":"Edit"},"web":"#value"},"value":"21"},{"id":"calculate","op":"click","targets":{"native":{"by":"auto_id","value":"Calculate","controlType":"Button"},"web":"#run"}},{"id":"result","op":"observeText","targets":{"native":{"by":"auto_id","value":"Result","controlType":"Text"},"web":"#result"},"expected":"42","settleMs":250}]}]};
+function refresh(){ $('compare').disabled=busy||!['contract','native','web'].every(id=>$(id).files.length);$('export').disabled=busy||!report; }
+for(const id of ['contract','native','web'])$(id).onchange=()=>{report=null;$('report').textContent='';$('status').textContent='Choose a contract and both evidence files.';refresh()};
+function download(value,name){const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000)}
+$('template').onclick=()=>download(example,'behavior-contract.json');
+async function load(id,max){const f=$(id).files[0];if(!f||f.size>max)throw Error('File exceeds limit: '+id);return JSON.parse(await f.text())}
+$('compare').onclick=async()=>{busy=true;report=null;refresh();try{const [c,n,w]=await Promise.all([load('contract',512*1024),load('native',8*1024*1024),load('web',8*1024*1024)]);validateContract(c);report=compareEvidence(c,n,w,await contractDigest(c));$('status').textContent=report.status+' · '+report.matchedObservations+'/'+report.observations+' observations matched · '+report.mismatchedSteps+' mismatches · '+report.unverifiedSteps+' unverified steps';$('report').textContent=JSON.stringify(report,null,2)}catch(e){$('status').textContent='Verification failed: '+e.message;$('report').textContent=''}finally{busy=false;refresh()}};
+$('export').onclick=()=>{if(report)download(report,'native-web-verification.json')};refresh();
