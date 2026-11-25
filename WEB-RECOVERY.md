@@ -4,7 +4,7 @@ The Pages frontend runs without a desktop install. All static analysis and expor
 
 ## Local web workflow
 
-Open https://marcusdhaynes.github.io/REAlity/ and choose a file or complete folder. The browser worker inventories PE/.NET, ZIP, Electron ASAR, source maps, MSI/OLE and other signatures. It can extract supported ZIP/ASAR entries, PE resources and embedded source-map text. It does not decompile native instructions, .NET IL, DEX, Python bytecode or MSI tables itself. Limits: 256 MiB combined input, 384 MiB expanded, 64 MiB per member, bounded recursion. Unsupported formats, malformed archives and missing sources appear in the report.
+Open https://marcusdhaynes.github.io/REAlity/ and choose a file or complete folder. The browser worker inventories PE/.NET, ZIP, Electron ASAR, source maps, MSI/OLE and other signatures. It can extract supported ZIP/ASAR entries, PE resources and embedded source-map text. When the native WASM engine is deployed, the worker automatically includes bounded native pseudo-C analysis of up to three selected PE/ELF binaries. Managed .NET IL, DEX, Python bytecode and MSI tables still require specialized engines. See [Advanced Recovery Lab](ADVANCED-RECOVERY.md) for function pagination, the browser virtual PC, guest trace capture, and runtime comparison. Limits: 256 MiB combined input, 384 MiB expanded, 64 MiB per member, bounded recursion. Unsupported formats, malformed archives and missing sources appear in the report.
 
 If a standalone HTML entry point is present, choose its recovered bundle, review files and download the project ZIP. Native Electron APIs, server dependencies, absolute paths and missing code can require reconstruction. The original analyzer is still available at inspector.html.
 
@@ -29,7 +29,7 @@ Configure REALITY_WEB_ORIGIN (for the default site, https://marcusdhaynes.github
 
 The service accepts POST /v1/reconstruct with an application/zip body and Bearer service key. It runs bounded static recovery, supplies selected evidence to the configured AI provider, returns a ZIP of reviewed-format static web files and a limitations report, and removes its temporary workspace. It does not execute the original or generated code. AI output is inferred and may be incomplete or incorrect. No model provider or cloud VM has been provisioned. No promise of native code parity is made.
 
-For enhanced static analysis, provision official REA/Ghidra, ILSpy, JADX, and other compatible tools in a dedicated sandboxed worker and explicitly set REALITY_EXTERNAL_STATIC=1. The default image contains none of those external tools. Do not enable this flag on a shared service without reviewing provider behavior, licensing, and isolation. Full runtime comparison, modern Windows virtualization, native WASM decompilation ports, automated multi-round builds and hosted compute remain future work.
+For enhanced static analysis, provision official REA/Ghidra, ILSpy, JADX, and other compatible tools in a dedicated sandboxed worker and explicitly set REALITY_EXTERNAL_STATIC=1. The default image contains none of those external tools. Do not enable this flag on a shared service without reviewing provider behavior, licensing, and isolation. Modern x64 Windows virtualization, full native behavioral equivalence, automated multi-round builds and hosted compute remain future work. Bounded native pseudo-C WASM analysis, compatible x86 emulation, screenshot trace comparison and browser runtime test tooling have been implemented but require successful build and live validation.
 
 ### Optional GitHub device login
 
