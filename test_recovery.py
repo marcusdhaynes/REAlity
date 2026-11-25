@@ -1,7 +1,7 @@
-import io, tempfile, unittest, zipfile, struct
+import io, tempfile, unittest, zipfile, struct, json
 from pathlib import Path
 from unittest.mock import patch
-from recovery import recover, inspect, hashfile, safe_name
+from recovery import recover, inspect, hashfile, safe_name, tool_command
 
 class RecoveryTests(unittest.TestCase):
     def setUp(self):
@@ -42,4 +42,15 @@ class RecoveryTests(unittest.TestCase):
         with patch('recovery.run_tool') as call:
             r=recover(f,self.p/'out',emit=lambda _:None);call.assert_not_called()
             self.assertTrue(r['tools']);self.assertTrue(all(x['status']=='not run (static mode)' for x in r['tools']))
+    def test_npm_shim_resolution(self):
+        shim=self.p/'rea.cmd';shim.write_text('ignored')
+        pkg=self.p/'node_modules/rea-agents';pkg.mkdir(parents=True)
+        (pkg/'package.json').write_text(json.dumps({'name':'rea-agents','bin':{'rea':'cli.js'}}))
+        script=pkg/'cli.js';script.write_text('// fixture')
+        with patch('recovery.shutil.which',return_value='node-fixture'):
+            self.assertEqual(tool_command('rea',str(shim)),['node-fixture',str(script.resolve())])
+            self.assertIsNone(tool_command('jadx',str(shim)))
+    def test_no_recursive_output(self):
+        d=self.p/'src';d.mkdir()
+        with self.assertRaises(ValueError):recover(d,d/'out')
 if __name__=='__main__':unittest.main()
