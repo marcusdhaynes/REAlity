@@ -34,3 +34,22 @@ jobs:
           name: REAlity-Windows
           path: dist/REAlity.exe
           if-no-files-found: error
+
+  publish-windows:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: windows-exe
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: REAlity-Windows
+          path: release
+      - name: Publish immutable preview build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          tag="preview-${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}"
+          gh release create "$tag" release/REAlity.exe --target "$GITHUB_SHA" --prerelease --title "REAlity Preview $GITHUB_RUN_NUMBER.$GITHUB_RUN_ATTEMPT" --notes "Automated Windows preview. Static recovery is implemented; external providers and full reconstruction remain experimental."
