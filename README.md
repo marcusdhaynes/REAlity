@@ -5,6 +5,8 @@ Local-first recovery of your own lost software source. Import an executable, ins
 ## Run
 Python 3.10+ with Tkinter: double-click Launch-REAlity.cmd on Windows, or run python desktop.py. CLI: python recovery.py TARGET NEW_WORKSPACE. Use --doctor to check optional providers, --external to opt into installed tools.
 
+The original standalone offline browser analyzer is preserved in REAlity-Offline.html and is accessible from the desktop workbench.
+
 ## Optional engines
 - REA: https://github.com/morluto/rea (npm package rea-agents; run setup and configure Ghidra).
 - Ghidra: https://github.com/NationalSecurityAgency/ghidra
