@@ -11,17 +11,23 @@ def identifier(x):
     return isinstance(x,str) and re.fullmatch(r'[A-Za-z0-9_-]{1,80}',x) and x not in ('__proto__','constructor','prototype')
 def string(x):
     return isinstance(x,str) and len(x)<=4000
+def exact(x,required,optional=()):
+    return isinstance(x,dict) and set(required)<=x.keys() and x.keys()<=set(required)|set(optional)
 def validate(s):
-    if not isinstance(s,dict) or s.get('version')!=1 or not isinstance(s.get('cases'),list) or not 1<=len(s['cases'])<=30:raise ValueError('Invalid contract')
+    if not exact(s,('version','cases')) or s.get('version')!=1 or not isinstance(s.get('cases'),list) or not 1<=len(s['cases'])<=30:raise ValueError('Invalid contract')
     cases=set()
     for c in s['cases']:
-        if not identifier(c.get('id')) or c['id'] in cases or not isinstance(c.get('steps'),list) or not 1<=len(c['steps'])<=40:raise ValueError('Invalid case')
+        if not exact(c,('id','steps')) or not identifier(c.get('id')) or c['id'] in cases or not isinstance(c.get('steps'),list) or not 1<=len(c['steps'])<=40:raise ValueError('Invalid case')
         cases.add(c['id']);steps=set();observed=0
         for t in c['steps']:
-            if not identifier(t.get('id')) or t['id'] in steps or t.get('op') not in OPS:raise ValueError('Invalid step')
-            steps.add(t['id']);n=t['targets']['native'];w=t['targets']['web']
-            if n.get('by') not in ('auto_id','title') or not string(n.get('value')) or not n['value'].strip() or not string(w) or not w.strip():raise ValueError('Invalid selector')
+            if not exact(t,('id','op','targets'),('value','expected','settleMs')) or not identifier(t.get('id')) or t['id'] in steps or t.get('op') not in OPS:raise ValueError('Invalid step')
+            steps.add(t['id'])
+            if not exact(t['targets'],('native','web')):raise ValueError('Invalid targets')
+            n=t['targets']['native'];w=t['targets']['web']
+            if not exact(n,('by','value'),('controlType',)) or n.get('by') not in ('auto_id','title') or not string(n.get('value')) or not n['value'].strip() or not string(w) or not w.strip():raise ValueError('Invalid selector')
             if 'controlType' in n and (not string(n['controlType']) or not re.fullmatch('[A-Za-z]+',n['controlType'])):raise ValueError('Invalid control type')
+            if 'settleMs' in t and (type(t['settleMs']) is not int or not 0<=t['settleMs']<=5000):raise ValueError('Invalid settle interval')
+            if (t['op'] not in ('fill','press') and 'value' in t) or (not t['op'].startswith('observe') and 'expected' in t):raise ValueError('Unexpected field')
             if t['op'] in ('fill','press') and not string(t.get('value')):raise ValueError('Invalid input')
             if t['op']=='press' and t['value'] not in KEYS:raise ValueError('Invalid portable key')
             if t['op'].startswith('observe'):
@@ -68,6 +74,7 @@ def run_case(exe,c):
         for t in c['steps']:
             try:
                 if process.poll() is not None:raise RuntimeError('Original process exited')
+                if t.get('settleMs'):time.sleep(t['settleMs']/1000)
                 value=perform(app,t)
                 observations.append({'id':t['id'],'ok':True,**({'value':value} if t['op'].startswith('observe') else {})})
             except Exception as e:
