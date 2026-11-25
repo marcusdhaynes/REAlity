@@ -4,7 +4,8 @@ on:
     branches: [main]
     paths:
       - 'docs/**'
-      - 'tests/browser.test.mjs'
+      - 'tests/**'
+      - 'scripts/stage_web_engines.py'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 permissions:
@@ -27,13 +28,17 @@ jobs:
           node-version: '22'
       - name: Verify browser recovery and publishing modules
         run: |
-          node --test tests/browser.test.mjs
+          node --test tests/*.test.mjs
+          node --check docs/advanced-lab.mjs
+          node --check scripts/compare-runtime.mjs
           node --check docs/workbench.mjs
           node --check docs/recovery-worker.mjs
       - name: Verify static entry point
         run: |
           test -s docs/index.html
           grep -q 'REAlity' docs/index.html
+      - name: Stage pinned browser engines
+        run: python3 scripts/stage_web_engines.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
