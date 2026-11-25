@@ -85,12 +85,33 @@ def walk(p):
             f=Path(root,name)
             if not f.is_symlink() and f.is_file() and not getattr(f.lstat(),'st_file_attributes',0)&0x400:yield f
 
+def tool_command(name, exe):
+    """Resolve known npm shims to their installed Node entry point without a shell."""
+    p=Path(exe).resolve()
+    if p.suffix.lower() not in {'.cmd','.bat'}:return [str(p)]
+    packages={'rea':('rea-agents',),'asar':('@electron/asar','asar')}
+    node=shutil.which('node')
+    if not node:return None
+    for package in packages.get(name,()):
+        for base in (p.parent/'node_modules',p.parent.parent/'node_modules'):
+            root=(base/package).resolve()
+            try:
+                meta=json.loads((root/'package.json').read_text(encoding='utf-8'))
+                if meta.get('name')!=package:continue
+                entry=meta.get('bin')
+                if isinstance(entry,dict):entry=entry.get(p.stem) or entry.get(name)
+                if not isinstance(entry,str):continue
+                script=(root/entry).resolve()
+                if root in script.parents and script.is_file():return [node,str(script)]
+            except (OSError,ValueError):continue
+    return None
+
 def run_tool(name,args,log,cwd,timeout=600):
     exe=locate(name)
     if not exe:return {'tool':name,'status':'not installed','arguments':args}
-    command=[exe,*map(str,args)]
-    if os.name=='nt' and Path(exe).suffix.lower() in {'.cmd','.bat'}:
-        return {'tool':name,'status':'shim unsupported; use provider CLI directly','arguments':args}
+    prefix=tool_command(name,exe)
+    if not prefix:return {'tool':name,'status':'unsupported launcher; install native CLI or supported npm package','arguments':args}
+    command=[*prefix,*map(str,args)]
     with log.open('wb') as f:
         try:
             proc=subprocess.run(command,cwd=cwd,stdout=f,stderr=subprocess.STDOUT,timeout=timeout,check=False,stdin=subprocess.DEVNULL)
@@ -143,6 +164,10 @@ def recover(target,out,external=False,emit=print):
             for name,args in jobs:
                 if external:
                     emit('Running '+name+' on '+p.name);result=run_tool(name,args,out/'Analysis'/f'{tag}-{name}.log',out/'Extracted')
+                    if name=='asar' and result['status']=='completed':
+                        if depth<MAX_DEPTH:
+                            roots.extend((q,depth+1) for q in walk(Path(args[-1])))
+                        else:report['warnings'].append('ASAR depth limit: '+p.name)
                 else:result={'tool':name,'status':'not run (static mode)','arguments':args}
                 report['tools'].append(result)
             save()
