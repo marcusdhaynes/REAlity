@@ -25,7 +25,7 @@ Analysis/report.json is evidence, not a claim of full recovery. Source files inc
 
 ## Development
 python -m unittest -v
-GitHub Actions runs tests and builds a Windows executable with PyInstaller. Build artifacts are available from successful workflow runs. No release is claimed until CI succeeds.
+GitHub Actions runs tests and builds a Windows executable with PyInstaller. Successful main-branch builds publish versioned Windows preview executables under GitHub Releases and retain the Actions build artifact. No release is claimed until CI succeeds.
 
 ## Roadmap
 Full native decompilation orchestration, recursive installer and ASAR extraction, PDB/source-map recovery, build manifest reconstruction, optional coding-agent integration, isolated behavior comparison, and portable cross-platform releases. Preserve recovered vs inferred provenance and do not label generated code as original.
