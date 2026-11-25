@@ -1,0 +1,64 @@
+name: Verify Native-to-Web Behavior
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/behavior-contract.mjs'
+      - 'scripts/collect-windows-evidence.py'
+      - 'scripts/collect-web-evidence.mjs'
+      - 'scripts/verify-behavior.mjs'
+      - 'tests/behavior-contract.test.mjs'
+      - 'tests/fixtures/native-windows/**'
+      - 'tests/fixtures/behavior-contract.json'
+      - 'tests/fixtures/runtime-rebuilt/**'
+      - 'package.json'
+      - '.github/workflows/native-web-verification.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  semantic-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/behavior-contract.test.mjs
+  trusted-native-fixture:
+    needs: semantic-regressions
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python -m pip install pywinauto==0.6.9
+      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install chromium
+      - run: dotnet build tests/fixtures/native-windows/Counter.csproj -c Release -o fixture-bin
+      - name: Collect native WPF runtime evidence
+        run: python scripts/collect-windows-evidence.py fixture-bin/Counter.exe tests/fixtures/behavior-contract.json native-evidence.json --authorized-isolated-vm
+      - name: Collect rebuilt web runtime evidence
+        if: always()
+        run: node scripts/collect-web-evidence.mjs tests/fixtures/runtime-rebuilt tests/fixtures/behavior-contract.json web-evidence.json
+      - name: Compare independently collected evidence
+        if: always()
+        run: node scripts/verify-behavior.mjs tests/fixtures/behavior-contract.json native-evidence.json web-evidence.json verification.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-web-verification-evidence
+          path: |
+            native-evidence.json
+            web-evidence.json
+            verification.json
+          if-no-files-found: warn
