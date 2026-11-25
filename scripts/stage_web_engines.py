@@ -45,6 +45,12 @@ def emulator(tmp,dest):
         if (p/name).is_file():shutil.copyfile(p/name,dest/name)
     for name in ('seabios.bin','vgabios.bin'):
         download(f'https://raw.githubusercontent.com/copy/v86/{BIOS_REF}/bios/{name}',dest/name,2*1024*1024)
+    download(f'https://raw.githubusercontent.com/copy/v86/{BIOS_REF}/src/iso9660.js',dest/'iso9660.mjs',256*1024)
+    iso=dest/'iso9660.mjs'
+    code=iso.read_text()
+    expected='import { dbg_assert } from "./log.js";'
+    if expected not in code:raise ValueError('Unexpected ISO generator source')
+    iso.write_text(code.replace(expected,'function dbg_assert(ok){if(!ok)throw new Error("ISO generator assertion failed");}',1))
     # Preserve firmware notices and corresponding source references.
     (dest/'FIRMWARE-SOURCES.txt').write_text('SeaBIOS / VGA BIOS binaries from copy/v86 commit '+BIOS_REF+'\nhttps://github.com/copy/v86/tree/'+BIOS_REF+'/bios\nhttps://github.com/coreboot/seabios\nSee upstream BIOS directory and licenses.\n')
 def main():
