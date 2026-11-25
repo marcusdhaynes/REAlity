@@ -1,0 +1,32 @@
+name: Verify Runtime Comparison
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/compare-runtime.mjs'
+      - 'docs/comparison.mjs'
+      - 'tests/fixtures/**'
+      - 'package.json'
+      - '.github/workflows/runtime-validation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Run equivalent implementations at three viewport sizes
+        run: node scripts/compare-runtime.mjs tests/fixtures/runtime-original tests/fixtures/runtime-rebuilt tests/fixtures/runtime-cases.json runtime-evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: runtime-comparison-evidence
+          path: runtime-evidence/
+          if-no-files-found: warn
