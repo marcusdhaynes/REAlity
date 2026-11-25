@@ -1,0 +1,13 @@
+{
+  "name": "reality-web-validation",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "compare-runtime": "node scripts/compare-runtime.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.51.1",
+    "pngjs": "7.0.0"
+  }
+}
