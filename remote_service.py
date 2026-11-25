@@ -6,6 +6,9 @@ import os
 import re
 import tempfile
 import urllib.request
+import urllib.parse
+import secrets
+import time
 import zipfile
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
@@ -83,6 +86,43 @@ def package(output,assets):
         for path,raw in entries.items():archive.writestr(path,raw)
     return out.getvalue()
 
+DEVICE_SESSIONS={}
+def github_device_request(endpoint,fields):
+    client=os.environ.get('REALITY_GITHUB_CLIENT_ID')
+    if not client:raise ValueError('GitHub OAuth app not configured')
+    request=urllib.request.Request('https://github.com'+endpoint,urllib.parse.urlencode({'client_id':client,**fields}).encode(),{'Accept':'application/json','Content-Type':'application/x-www-form-urlencoded'},method='POST')
+    class NoRedirect(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self,*args,**kwargs):raise ValueError('Redirect refused')
+    with urllib.request.build_opener(NoRedirect()).open(request,timeout=25) as res:
+        return json.loads(res.read(64*1024))
+
+def device_start():
+    now=time.monotonic()
+    for k,v in list(DEVICE_SESSIONS.items()):
+        if v['expires']<=now:DEVICE_SESSIONS.pop(k,None)
+    if len(DEVICE_SESSIONS)>=40:raise ValueError('Too many authorizations')
+    d=github_device_request('/login/device/code',{'scope':'public_repo workflow'})
+    if d.get('verification_uri')!='https://github.com/login/device':raise ValueError('Unexpected verification URL')
+    session=secrets.token_urlsafe(32);interval=max(5,int(d['interval']))
+    DEVICE_SESSIONS[session]={'device_code':d['device_code'],'expires':now+min(900,int(d['expires_in'])),'interval':interval,'next':now+interval}
+    return {'session':session,'user_code':d['user_code'],'verification_uri':d['verification_uri'],'interval':interval,'expires_in':int(d['expires_in'])}
+
+def device_poll(session):
+    now=time.monotonic();d=DEVICE_SESSIONS.get(session)
+    if not d or now>=d['expires']:
+        DEVICE_SESSIONS.pop(session,None);return {'error':'expired_token'}
+    if now<d['next']:return {'error':'authorization_pending','interval':max(1,int(d['next']-now)+1)}
+    d['next']=now+d['interval']
+    result=github_device_request('/login/oauth/access_token',{'device_code':d['device_code'],'grant_type':'urn:ietf:params:oauth:grant-type:device_code'})
+    if result.get('access_token'):
+        DEVICE_SESSIONS.pop(session,None)
+        return {'access_token':result['access_token'],'scope':result.get('scope','')}
+    error=result.get('error','authorization_pending')
+    if error=='slow_down':
+        d['interval']+=5;d['next']=now+d['interval']
+    elif error!='authorization_pending':DEVICE_SESSIONS.pop(session,None)
+    return {'error':error,'interval':d['interval']}
+
 class Handler(BaseHTTPRequestHandler):
     timeout=60
     def origin_ok(self):return self.headers.get('Origin')==os.environ['REALITY_WEB_ORIGIN']
@@ -98,8 +138,17 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(204);self.send_header('Access-Control-Allow-Origin',os.environ['REALITY_WEB_ORIGIN']);self.send_header('Vary','Origin')
         self.send_header('Access-Control-Allow-Methods','POST, OPTIONS');self.send_header('Access-Control-Allow-Headers','Authorization, Content-Type');self.end_headers()
     def do_POST(self):
-        if self.path!='/v1/reconstruct':return self.reply(404,'Unknown endpoint')
         if not self.origin_ok() or not hmac.compare_digest(self.headers.get('Authorization','').encode(),('Bearer '+os.environ['REALITY_SERVICE_KEY']).encode()):return self.reply(403,'Authorization refused')
+        if self.path in ('/v1/github/device/start','/v1/github/device/poll'):
+            try:
+                n=int(self.headers.get('Content-Length','0'))
+                if n<0 or n>4096 or self.headers.get('Transfer-Encoding'):return self.reply(413,'Invalid authorization request')
+                payload=json.loads(self.rfile.read(n) or b'{}')
+                data=device_start() if self.path.endswith('/start') else device_poll(payload.get('session',''))
+                raw=json.dumps(data).encode();self.headers_for(200,'application/json',len(raw));self.wfile.write(raw)
+            except Exception:self.reply(422,'GitHub device authorization unavailable')
+            return
+        if self.path!='/v1/reconstruct':return self.reply(404,'Unknown endpoint')
         try:
             size=int(self.headers.get('Content-Length','0'))
             if size<=0 or size>MAX_INPUT or self.headers.get('Transfer-Encoding'):return self.reply(413,'Input exceeds limit')
