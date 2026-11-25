@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'docs/**'
+      - 'tests/browser.test.mjs'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 permissions:
@@ -21,6 +22,14 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify browser recovery and publishing modules
+        run: |
+          node --test tests/browser.test.mjs
+          node --check docs/workbench.mjs
+          node --check docs/recovery-worker.mjs
       - name: Verify static entry point
         run: |
           test -s docs/index.html
