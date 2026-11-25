@@ -17,7 +17,7 @@ The original standalone offline browser analyzer is preserved in REAlity-Offline
 - PyInstaller extractor: https://github.com/pyinstxtractor/pyinstxtractor-ng
 - Craft Anything: https://github.com/storytold/craft-anything (optional independent reconstruction workflow; use Deep mode for your own software).
 
-Install only trusted official releases. Provider executables must be on PATH; Windows .cmd shims are not invoked by the engine. External tools process copies and are not sandboxed by REAlity. Keep unknown applications in an isolated VM. The application never launches the target itself. AI-assisted rebuilding is not implemented in this version; Craft Anything can be opened separately.
+Install only trusted official releases. Provider executables must be on PATH; Known REA and ASAR npm shims on Windows resolve to their installed Node entry point; other shell wrappers are not invoked by the engine. External tools process copies and are not sandboxed by REAlity. Keep unknown applications in an isolated VM. The application never launches the target itself. AI-assisted rebuilding is not implemented in this version; Craft Anything can be opened separately.
 
 ## Output
 Original / Extracted / Source / Assets / Dependencies / Analysis / Reconstructed / Tests.
