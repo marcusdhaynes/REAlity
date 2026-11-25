@@ -1,0 +1,2 @@
+import {recover} from './recovery-engine.mjs';
+self.onmessage=async ({data})=>{try{const inputs=data.files.map((file,i)=>({name:file.name,size:file.size,webkitRelativePath:data.paths[i],arrayBuffer:()=>file.arrayBuffer()}));const result=await recover(inputs,message=>self.postMessage({type:'progress',message}));const transfers=[...new Set(result.files.map(f=>f.data.buffer))];self.postMessage({type:'result',result},transfers)}catch(e){self.postMessage({type:'error',message:e.message})}};
