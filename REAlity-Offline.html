@@ -1,0 +1,148 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>REAlity — Offline Analyzer</title><style>:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#edeaf4;background:#0a0a11;font-synthesis:none;text-rendering:optimizeLegibility}*{box-sizing:border-box}body{margin:0}button,input{font:inherit}button{cursor:pointer}.shell{display:flex;min-height:100vh}.sidebar{width:246px;min-width:246px;background:#0f0e19;border-right:1px solid #24222e;display:flex;flex-direction:column}.brand{display:flex;gap:12px;align-items:center;padding:25px 21px 35px}.mark{height:42px;width:42px;background:linear-gradient(145deg,#aa8dff,#52329d);border-radius:13px;display:grid;place-items:center;font-size:25px;font-weight:900;color:#100d1c;box-shadow:0 0 24px #6e4ace44}.mark span{font-size:13px;transform:translate(-4px,-7px)}.brand-name{font-weight:750;font-size:21px;letter-spacing:-.7px}.brand-sub{font-size:9px;letter-spacing:2px;color:#8b839e}.sidebar-header{display:flex;align-items:center;justify-content:space-between;padding:0 20px 9px;color:#726e85;font-size:10px;font-weight:750;letter-spacing:1.4px}.small-icon{background:#1c1a2a;border:1px solid #343144;color:#bfaaff;border-radius:6px;padding:0;width:24px;height:24px;font-size:20px}.projects{flex:1;overflow:auto;padding:0 10px}.empty-projects{font-size:12px;padding:0 10px}.project{width:100%;border:0;background:transparent;text-align:left;display:flex;align-items:center;gap:11px;color:#b0aabd;padding:10px;border-radius:9px;min-width:0}.project:hover{background:#1b1926}.project.selected{background:#292139;color:#eee4ff}.file-icon{font-size:22px;color:#b39bfe}.project-text{display:flex;flex-direction:column;min-width:0}.project-text strong{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.project-text small{font-size:11px;color:#888399}.sidebar-bottom{border-top:1px solid #24222e;padding:19px;color:#b6b1c0;font-size:11px;display:flex;align-items:center;gap:8px}.green-dot{width:7px;height:7px;border-radius:50%;background:#60d5b1}.mode{margin-left:auto;border:1px solid #3c354e;color:#aa96d6;padding:4px 6px;border-radius:5px;font-size:9px;font-weight:750;letter-spacing:.7px}main{flex:1;display:flex;flex-direction:column;min-width:0}header{height:72px;border-bottom:1px solid #24222e;display:flex;align-items:center;justify-content:space-between;padding:0 35px;gap:10px}.breadcrumbs{font-size:11px;color:#817a8e;letter-spacing:1px}.breadcrumbs span{margin:0 12px;color:#4a4554}.breadcrumbs strong{color:#d7d1e5;letter-spacing:.2px}.head-right{display:flex;gap:24px;align-items:center}.version{font-size:11px;color:#777084}.primary{background:#9871ea;border:0;color:#160e27;border-radius:9px;padding:11px 17px;font-weight:750;font-size:12px}.primary:hover{background:#b091fa}.primary:disabled{opacity:.6}.content{width:100%;max-width:1400px;margin:0 auto;padding:35px;flex:1}.welcome{max-width:1050px;margin:50px auto 0}.eyebrow{font-size:10px;font-weight:800;color:#bb9cff;letter-spacing:2.1px}.welcome h1,.analysis-title h1{font-size:clamp(28px,4vw,49px);line-height:1.05;letter-spacing:-2px;margin:14px 0 14px;font-weight:770}.welcome>p{max-width:640px;font-size:14px;line-height:1.85;color:#aaa4b6}.dropzone{border:1.5px dashed #655382;background:linear-gradient(115deg,#181222,#13121e);border-radius:18px;margin:37px 0 22px;padding:58px 20px;text-align:center;cursor:pointer;transition:.2s}.dropzone:hover,.dropzone.dragging{border-color:#bc9af9;background:#21162e}.drop-icon{height:58px;width:58px;margin:0 auto 12px;border-radius:19px;background:#382749;color:#d3baff;font-size:41px;font-weight:200}.dropzone h2{font-size:18px;margin:7px 0}.dropzone p{font-size:12px;color:#9c96aa}.accepted{display:block;margin-top:25px;color:#766c88;letter-spacing:1.3px;font-size:9px;font-weight:700}.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.feature-grid>div{background:#11111b;border:1px solid #292533;border-radius:13px;padding:23px;display:flex;flex-direction:column;gap:8px}.feature-grid b{color:#8b70cb;font-size:14px}.feature-grid strong{font-size:13px}.feature-grid small{color:#8b859b;font-size:11px;line-height:1.5}.analysis-title h1{font-size:31px;word-break:break-all;margin:12px 0}.subline{font-size:12px;color:#8e899e}.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:31px 0 23px}.metric{border:1px solid #2b2737;border-radius:11px;background:#14131e;padding:18px}.metric span{display:block;font-size:10px;letter-spacing:1.4px;color:#8f859f;margin-bottom:9px}.metric strong{font-size:21px;letter-spacing:-.5px;overflow-wrap:anywhere}.tabs{display:flex;flex-wrap:wrap;gap:6px;border-bottom:1px solid #2b2737;margin:0 0 21px}.tabs button{padding:13px 15px;background:transparent;color:#9e96ae;border:0;border-bottom:2px solid transparent;font-size:12px}.tabs button span{color:#8c76c5;margin-right:6px}.tabs button.current{color:#e5dcf5;border-color:#a887f9}.tabs button:hover{color:#ffffff}.panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.panel{background:#14131e;border:1px solid #2b2737;border-radius:13px;padding:23px;margin-bottom:16px;min-width:0}.panel h3{font-size:15px;margin:0 0 21px}.pair{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;border-bottom:1px solid #282432;padding:13px 0;font-size:12px}.pair:last-child{border-bottom:0}.pair span{color:#8e879d}.pair strong{font-weight:600;overflow-wrap:anywhere;text-align:right}.hash{font-size:10px;max-width:210px;overflow-wrap:anywhere;text-align:right;color:#c6b3ee}.finding{padding:15px 0;border-bottom:1px solid #2b2737}.finding:last-child{border-bottom:0}.finding-title{display:flex;gap:8px;align-items:center;font-weight:650;font-size:12px}.pip{width:7px;height:7px;border-radius:50%;background:#b897ed}.confidence{margin-left:auto;font-size:10px;padding:4px 6px;color:#aaa0bd;background:#262034;border-radius:5px;text-transform:uppercase}.finding p{font-size:12px;color:#aaa3b7;line-height:1.55}.finding small{color:#7b7390;font-size:10px}.warning-panel{border-color:#483c31}.warning-panel p{font-size:12px;color:#c6a989}.section-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:18px}.section-head h3{margin:0 0 6px}.section-head small{font-size:11px;color:#777386}.search{padding:10px 12px;border-radius:8px;background:#1c1a28;border:1px solid #393344;color:#fff;font-size:12px;min-width:200px;outline:none}.search:focus{border-color:#9871ea}.table-wrap{overflow:auto;max-height:57vh}table{border-collapse:collapse;width:100%;font-size:11px}th{font-size:10px;letter-spacing:1px;color:#887f99;text-align:left;padding:11px 9px;border-bottom:1px solid #302c3e}td{padding:11px 9px;border-bottom:1px solid #252230;color:#aea8b8}td.path{color:#c9bbde;overflow-wrap:anywhere}.path{overflow-wrap:anywhere}.offset{font-family:monospace;color:#9f87d1}.muted{color:#8e889c;font-size:12px;line-height:1.7}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;color:#c5b8dc;background:#0e0e15;border:1px solid #2a2636;border-radius:9px;padding:16px;max-height:55vh;overflow:auto}.limitations{font-size:12px;color:#a99cb3;margin-top:12px}.export-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin:25px 0}.export-grid button{display:flex;flex-direction:column;align-items:flex-start;gap:11px;background:#261c35;border:1px solid #5b4677;color:#c8b2e6;border-radius:10px;padding:20px;text-align:left}.export-grid button:hover{border-color:#b99bf9}.export-grid strong{font-size:12px;color:#f2eafa}.export-grid small{color:#a89caf}.export-note{font-size:12px;color:#8e859e;line-height:1.7}.errors{padding:14px;margin-bottom:15px;background:#442329;border:1px solid #8c4a52;border-radius:8px;font-size:12px;color:#ffc7ca}.hidden{display:none}footer{padding:17px 35px;display:flex;justify-content:space-between;color:#5d586b;border-top:1px solid #25212e;font-size:10px}.drop-overlay{position:fixed;inset:12px;border:2px dashed #b8a0fa;display:grid;place-items:center;color:#ece1ff;background:#271b37e6;border-radius:15px;font-size:28px;pointer-events:none;z-index:50}@media(max-width:850px){.sidebar{width:70px;min-width:70px}.brand{padding:19px 13px}.brand-name,.brand-sub,.sidebar-header,.project-text,.sidebar-bottom{display:none}.projects{padding:0 5px}.content{padding:18px}.panel-grid{grid-template-columns:1fr}header{padding:0 18px}.head-right .version{display:none}.metric-grid{grid-template-columns:repeat(2,1fr)}.feature-grid{grid-template-columns:1fr}.welcome{margin-top:14px}}@media(max-width:480px){.sidebar{width:53px;min-width:53px}.brand{padding:12px 6px}.mark{width:39px;height:39px}.content{padding:13px}.metric-grid{gap:8px}.metric{padding:12px}.metric strong{font-size:15px}.export-grid{grid-template-columns:1fr}.search{min-width:120px;width:100%}.section-head{flex-direction:column;align-items:stretch}.accepted{letter-spacing:.2px}.dropzone{padding:40px 10px}footer{padding:12px;font-size:9px}.primary{padding:9px 12px}}
+
+.provider-section{border-top:1px solid #332c42;margin:24px 0 16px;padding-top:23px}.provider-section h3{margin-bottom:12px}.provider-buttons{display:flex;gap:10px;flex-wrap:wrap}.provider-buttons button{padding:12px 16px;border-radius:9px;background:#302342;border:1px solid #7355a1;color:#e8d6ff;font-size:12px;font-weight:650}.provider-buttons button:hover{border-color:#b18af9}.provider-buttons button:disabled{opacity:.4}.provider-result{margin-top:15px;background:#1d1a28;border:1px solid #453b54;border-radius:9px;padding:12px;display:flex;flex-direction:column;gap:7px}.provider-result strong{font-size:12px}.provider-result small{font-size:10px;overflow-wrap:anywhere;color:#aaa1b6}
+
+.offline-layout{max-width:1060px;margin:auto;padding:40px 22px}.offline-top{display:flex;justify-content:space-between;align-items:center}.offline-logo{font-size:26px;font-weight:800;letter-spacing:-1px;color:#e3d3ff}.offline-sub{font-size:10px;color:#977eab;letter-spacing:1.7px}.offline-drop{padding:45px 20px;margin:25px 0;border:1px dashed #7156a5;border-radius:16px;text-align:center;background:#181323;cursor:pointer}.offline-drop:hover,.offline-drop.drag{background:#271b38}.offline-drop h2{font-size:22px}.offline-drop p{color:#aca3bc;font-size:13px}.offline-results{margin-top:24px}.offline-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.offline-card{border:1px solid #342640;border-radius:12px;padding:17px;background:#171322}.offline-card span{display:block;font-size:10px;letter-spacing:1.3px;color:#9f90ae}.offline-card strong{font-size:18px;margin-top:8px;display:block;overflow-wrap:anywhere}.offline-table{width:100%;border-collapse:collapse;margin-top:12px}.offline-table td,.offline-table th{border-bottom:1px solid #32283f;text-align:left;padding:10px;font-size:11px}.offline-bar{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}.offline-bar button{background:#37284f;border:1px solid #7856a0;border-radius:8px;color:#efe2ff;padding:11px 14px;font-size:12px}.offline-bar button:hover{border-color:#c0a3f2}.offline-hidden{display:none}.offline-alert{color:#fcb5c1;background:#351e2a;padding:12px;border-radius:8px}.offline-files{max-height:320px;overflow:auto}.offline-list{color:#aca3bc;line-height:1.7}@media(max-width:580px){.offline-grid{grid-template-columns:1fr}.offline-layout{padding:18px}.offline-drop{padding:25px 10px}}
+</style></head><body><div class="offline-layout"><div class="offline-top"><div><div class="offline-logo">REAlity</div><div class="offline-sub">OFFLINE / NO AI REQUIRED</div></div><div class="mode">STATIC ANALYSIS</div></div><div class="welcome" style="margin-top:30px"><div class="eyebrow">ORGANIZED FILE INVESTIGATIONS</div><h1>Know what’s inside.</h1><p>Drag in an APK, installer, ZIP, EXE, or game file. It stays on your device. Export verifiable JSON and Markdown to help your own development.</p></div><div id="drop" class="offline-drop"><div class="drop-icon">⇧</div><h2>Drop Files to Analyze</h2><p>Or click to choose files · Batch support</p><div class="accepted">APK / IPA / EXE / ZIP / DLL / GAME FILES / MORE</div></div><input id="picker" type="file" multiple class="offline-hidden"/><div id="error"></div><div id="results" class="offline-results"></div><p class="offline-sub">Structural inspection only; this offline web version cannot decompile protected binaries or rebuild applications. For optional JADX/REA engines, use the full source/desktop or CLI workflow.</p></div><script>const MAX_WEB_BYTES = 128 * 1024 * 1024;
+const textDecoder = new TextDecoder('utf-8', { fatal: false });
+function signature(bytes, bytesNeeded) { return bytesNeeded.every((b, i) => bytes[i] === b); }
+function classify(name, b) {
+    const ext = name.toLowerCase().split('.').pop();
+    if (signature(b, [0x50, 0x4b, 0x03, 0x04]) || signature(b, [0x50, 0x4b, 0x05, 0x06])) {
+        if (ext === 'apk' || ext === 'aab')
+            return ['android-package', 'ZIP-based Android package'];
+        if (ext === 'ipa')
+            return ['ios-package', 'ZIP-based iOS package'];
+        if (ext === 'jar')
+            return ['java-archive', 'Java archive'];
+        return ['zip-archive', 'ZIP-compatible archive'];
+    }
+    if (signature(b, [0x4d, 0x5a]))
+        return ['windows-pe', 'Windows executable / PE candidate'];
+    if (signature(b, [0x7f, 0x45, 0x4c, 0x46]))
+        return ['elf', 'Executable and Linkable Format'];
+    if (b.length >= 4 && [0xfeedface, 0xfeedfacf, 0xcefaedfe, 0xcffaedfe, 0xcafebabe, 0xbebafeca].includes(new DataView(b.buffer, b.byteOffset, Math.min(b.byteLength, 4)).getUint32(0, false)))
+        return ['mach-o', 'Mach-O or universal binary'];
+    if (signature(b, [0x64, 0x65, 0x78, 0x0a]))
+        return ['android-dex', 'Android Dalvik bytecode'];
+    if (signature(b, [0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c]))
+        return ['7z-archive', '7-Zip archive'];
+    if (signature(b, [0x52, 0x61, 0x72, 0x21, 0x1a, 0x07]))
+        return ['rar-archive', 'RAR archive'];
+    if (signature(b, [0x55, 0x6e, 0x69, 0x74, 0x79, 0x46, 0x53]))
+        return ['unity-bundle', 'UnityFS bundle'];
+    if (signature(b, [0x89, 0x50, 0x4e, 0x47]))
+        return ['png', 'PNG image'];
+    if (signature(b, [0xff, 0xd8, 0xff]))
+        return ['jpeg', 'JPEG image'];
+    if (signature(b, [0x25, 0x50, 0x44, 0x46]))
+        return ['pdf', 'PDF document'];
+    if (signature(b, [0x4d, 0x53, 0x43, 0x46]))
+        return ['cab', 'Microsoft Cabinet archive'];
+    return ['unknown', 'Unknown or unsupported file signature'];
+}
+function readZIP(bytes) {
+    const files = [], warnings = [];
+    const v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    // ZIP end of central directory must reside within the last 65557 bytes.
+    let eocd = -1;
+    for (let i = Math.max(0, bytes.length - 65557); i <= bytes.length - 22; i++) {
+        if (v.getUint32(i, true) === 0x06054b50)
+            eocd = i;
+    }
+    if (eocd < 0)
+        return { files, warnings: ['ZIP end-of-central-directory record unavailable'] };
+    const entryCount = v.getUint16(eocd + 10, true), offset = v.getUint32(eocd + 16, true);
+    if (entryCount === 0xffff || offset === 0xffffffff)
+        return { files, warnings: ['ZIP64 inventory needs the native engine'] };
+    let cursor = offset;
+    for (let i = 0; i < Math.min(entryCount, 50000); i++) {
+        if (cursor + 46 > bytes.length || v.getUint32(cursor, true) !== 0x02014b50) {
+            warnings.push('Incomplete or inconsistent ZIP central directory');
+            break;
+        }
+        const flags = v.getUint16(cursor + 8, true), crc = v.getUint32(cursor + 16, true);
+        const comp = v.getUint32(cursor + 20, true), size = v.getUint32(cursor + 24, true);
+        const n = v.getUint16(cursor + 28, true), extra = v.getUint16(cursor + 30, true), comment = v.getUint16(cursor + 32, true);
+        if (cursor + 46 + n + extra + comment > bytes.length) {
+            warnings.push('Truncated ZIP entry');
+            break;
+        }
+        const nameBytes = bytes.subarray(cursor + 46, cursor + 46 + n);
+        const name = textDecoder.decode(nameBytes);
+        const unsafe = name.startsWith('/') || name.startsWith('\\') || /^[a-z]:/i.test(name) || name.replace(/\\/g, '/').split('/').includes('..');
+        files.push({ path: name, size, compressed_size: comp, crc32: crc.toString(16).padStart(8, '0'), is_directory: name.endsWith('/'), encrypted: !!(flags & 1), unsafe_path: unsafe });
+        if (unsafe)
+            warnings.push(`Unsafe archive entry: ${name}`);
+        if (size > 10 * 1024 * 1024 && size > 100 * Math.max(comp, 1))
+            warnings.push(`Possible archive bomb: ${name}`);
+        cursor += 46 + n + extra + comment;
+    }
+    if (entryCount > 50000)
+        warnings.push('Archive inventory truncated at 50,000 entries');
+    return { files, warnings };
+}
+function printableStrings(bytes) {
+    const result = [];
+    let start = -1;
+    const max = Math.min(bytes.length, 8 * 1024 * 1024);
+    for (let i = 0; i <= max; i++) {
+        const ok = i < max && bytes[i] >= 32 && bytes[i] <= 126;
+        if (ok && start < 0)
+            start = i;
+        if (!ok && start >= 0) {
+            if (i - start >= 6)
+                result.push({ offset: start, value: textDecoder.decode(bytes.subarray(start, Math.min(start + 240, i))) });
+            start = -1;
+            if (result.length >= 500)
+                break;
+        }
+    }
+    return result;
+}
+function peMetadata(b) {
+    if (b.length < 64)
+        return { error: 'Truncated DOS header' };
+    const v = new DataView(b.buffer, b.byteOffset, b.byteLength), at = v.getUint32(60, true);
+    if (at + 24 > b.length || v.getUint32(at, true) !== 0x00004550)
+        return { error: 'PE signature unavailable' };
+    return { machine: '0x' + v.getUint16(at + 4, true).toString(16), section_count: v.getUint16(at + 6, true), optional_header_size: v.getUint16(at + 20, true) };
+}
+async function analyzeBrowserFile(file) {
+    if (file.size > MAX_WEB_BYTES)
+        throw new Error(`This file exceeds the 128 MiB browser analysis limit. Use the desktop analyzer or offline CLI.`);
+    const buffer = await file.arrayBuffer(), bytes = new Uint8Array(buffer);
+    const hashBuf = await crypto.subtle.digest('SHA-256', buffer);
+    const hash = [...new Uint8Array(hashBuf)].map(b => b.toString(16).padStart(2, '0')).join('');
+    const [type, description] = classify(file.name, bytes);
+    const isZip = type.includes('archive') || type.endsWith('package');
+    const inventory = isZip && (bytes[0] === 0x50) ? readZIP(bytes) : { files: [], warnings: [] };
+    const metadata = { magic_hex: [...bytes.subarray(0, 32)].map(n => n.toString(16).padStart(2, '0')).join(''), analysis_scope: 'static only' };
+    if (type === 'windows-pe')
+        metadata.pe = peMetadata(bytes);
+    if (type === 'android-package')
+        metadata.android = { manifest_present: inventory.files.some(f => f.path === 'AndroidManifest.xml'), dex_files: inventory.files.filter(f => /^classes\d*\.dex$/.test(f.path)).map(f => f.path), native_libraries: inventory.files.filter(f => /^lib\/.+\.so$/.test(f.path)).length };
+    const warnings = [...inventory.warnings];
+    if (type === 'unknown')
+        warnings.push('Unknown format; a specialized engine is needed');
+    if (file.size > 8 * 1024 * 1024)
+        warnings.push('Printable strings only sampled from the first 8 MiB');
+    const findings = [{ title: 'File format identification', observation: description, evidence: 'file header + extension', confidence: type === 'unknown' ? 'low' : 'high' }];
+    if (inventory.files.length)
+        findings.push({ title: 'Container inventory', observation: `Identified ${inventory.files.length} members without executing or unpacking them`, evidence: 'ZIP central directory', confidence: 'high' });
+    return { schema_version: '1.0', engine: { name: 'REAlity Web Inspector', version: '0.1.0', method: 'browser-offline-static', ai_used: false }, target: { name: file.name, size: file.size, sha256: hash, type, description }, metadata, files: inventory.files, strings: printableStrings(bytes), findings, warnings, recovered: { assets: [], source_code: [], symbols: [] }, limitations: ['Browser preview is structural analysis, not full decompilation', 'Advanced extraction requires compatible offline engine providers', 'Unknown, obfuscated and encrypted portions may not be recoverable'], provenance: { sha256: hash, ai_used: false, tool: 'reality_web' }, analyzed_at: new Date().toISOString() };
+}
+function markdownReport(r) {
+    return [`# REAlity — ${r.target.name}`, '', `**Type:** ${r.target.description}`, `**SHA-256:** ${r.target.sha256}`, `**Size:** ${r.target.size} bytes`, `**AI:** Not used`, '', '## Evidence-based findings', ...r.findings.map(f => `- **${f.title}:** ${f.observation} (${f.evidence})`), '', '## Files', ...r.files.slice(0, 2500).map(f => `- ${f.path} (${f.size} bytes)`), '', '## Warnings', ...(r.warnings.length ? r.warnings : ['None']), '', '## Limitations', ...r.limitations].join('\n');
+}
+
+const picker=document.getElementById('picker'),drop=document.getElementById('drop'),results=document.getElementById('results'),err=document.getElementById('error');
+const all=[];
+drop.onclick=()=>picker.click();drop.ondragover=e=>{e.preventDefault();drop.classList.add('drag')};drop.ondragleave=()=>drop.classList.remove('drag');drop.ondrop=e=>{e.preventDefault();drop.classList.remove('drag');run([...e.dataTransfer.files])};picker.onchange=()=>{run([...picker.files]);picker.value=''};
+const fmt=n=>n<1024?n+' B':n<1024*1024?(n/1024).toFixed(1)+' KB':(n/1024/1024).toFixed(1)+' MB';
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+function download(name,data,type){const url=URL.createObjectURL(new Blob([data],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function show(){results.innerHTML=all.map((r,i)=>`<section class="panel"><div class="eyebrow">INVESTIGATION ${all.length-i}</div><h3>${esc(r.target.name)}</h3><div class="offline-grid"><div class="offline-card"><span>FORMAT</span><strong>${esc(r.target.type)}</strong></div><div class="offline-card"><span>FILE SIZE</span><strong>${fmt(r.target.size)}</strong></div><div class="offline-card"><span>INDEXED FILES</span><strong>${r.files.length}</strong></div></div><p class="muted">SHA-256: <code>${r.target.sha256}</code></p><div class="offline-bar"><button data-action="json" data-index="${i}">Export JSON</button><button data-action="md" data-index="${i}">Export Report</button><button data-action="files" data-index="${i}">Export File List</button></div><h3>Archive Inventory</h3><div class="offline-files"><table class="offline-table"><thead><tr><th>FILE PATH</th><th>SIZE</th></tr></thead><tbody>${r.files.slice(0,400).map(f=>`<tr><td>${esc(f.path)}</td><td>${fmt(f.size)}</td></tr>`).join('')}</tbody></table></div>${r.files.length?'':'<p class="muted">No ZIP-style file inventory available.</p>'}<h3>Warnings</h3><div class="offline-list">${r.warnings.length?r.warnings.map(w=>'<div>• '+esc(w)+'</div>').join(''):'No warnings from this limited static scan.'}</div></section>`).join('');}
+results.onclick=e=>{const b=e.target.closest('button[data-action]');if(!b)return;const r=all[+b.dataset.index];if(!r)return;const a=b.dataset.action;if(a==='json')download(r.target.name+'.reality.json',JSON.stringify(r,null,2),'application/json');if(a==='md')download(r.target.name+'.report.md',markdownReport(r),'text/markdown');if(a==='files')download(r.target.name+'.files.json',JSON.stringify(r.files,null,2),'application/json')};
+async function run(files){err.textContent='';for(const f of files){try{const r=await analyzeBrowserFile(f);all.unshift(r)}catch(e){const div=document.createElement('div');div.className='offline-alert';div.textContent=f.name+': '+e.message;err.appendChild(div)}}show()}
+</script></body></html>
