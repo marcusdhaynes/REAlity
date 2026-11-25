@@ -1,0 +1,32 @@
+{
+  "cases": [
+    {
+      "name": "double",
+      "steps": [
+        {
+          "op": "expectText",
+          "selector": "#result",
+          "value": "Ready"
+        },
+        {
+          "op": "fill",
+          "selector": "#value",
+          "value": "21"
+        },
+        {
+          "op": "click",
+          "selector": "#run"
+        },
+        {
+          "op": "expectText",
+          "selector": "#result",
+          "value": "42"
+        },
+        {
+          "op": "snapshot",
+          "name": "result"
+        }
+      ]
+    }
+  ]
+}
