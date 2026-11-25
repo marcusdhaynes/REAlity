@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "double",
+      "steps": [
+        {
+          "id": "enter",
+          "op": "fill",
+          "targets": {
+            "native": {
+              "by": "auto_id",
+              "value": "Input",
+              "controlType": "Edit"
+            },
+            "web": "#value"
+          },
+          "value": "21"
+        },
+        {
+          "id": "calculate",
+          "op": "click",
+          "targets": {
+            "native": {
+              "by": "auto_id",
+              "value": "Calculate",
+              "controlType": "Button"
+            },
+            "web": "#run"
+          }
+        },
+        {
+          "id": "result",
+          "op": "observeText",
+          "targets": {
+            "native": {
+              "by": "auto_id",
+              "value": "Result",
+              "controlType": "Text"
+            },
+            "web": "#result"
+          },
+          "expected": "42",
+          "settleMs": 250
+        }
+      ]
+    }
+  ]
+}
