@@ -1,7 +1,8 @@
 // Run only in a disposable network-restricted browser worker.
 import { chromium } from 'playwright';
-import { readFile, realpath, writeFile, stat } from 'node:fs/promises';
+import { readFile, realpath, writeFile, stat, readdir } from 'node:fs/promises';
 import path from 'node:path';
+import {createHash} from 'node:crypto';
 import { validateContract,contractDigest } from '../docs/behavior-contract.mjs';
 const MIME={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.json':'application/json','.png':'image/png','.svg':'image/svg+xml','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.woff2':'font/woff2','.wasm':'application/wasm'};
 const ORIGIN='http://reality-test.invalid';
@@ -16,6 +17,7 @@ async function runCase(browser,root,c){
   await page.goto(ORIGIN+'/index.html',{waitUntil:'domcontentloaded',timeout:8000});
   for(const t of c.steps){
    try{
+    if(t.settleMs)await page.waitForTimeout(t.settleMs);
     const loc=page.locator(t.targets.web);let value;
     if(t.op==='observeVisible'){const count=await loc.count();if(count>1)throw Error('Ambiguous web selector');value=count===1&&await loc.isVisible();}
     else{
@@ -40,6 +42,11 @@ const {contract}=validateContract(JSON.parse(await readFile(contractPath,'utf8')
 const browser=await chromium.launch({headless:true,chromiumSandbox:true,args:['--disable-background-networking']});
 const cases=[];
 try{for(const c of contract.cases)cases.push(await runCase(browser,root,c));}finally{await browser.close()}
-const evidence={version:1,side:'web',adapter:'Playwright Chromium',contractSha256:await contractDigest(contract),cases};
+async function hashSite(dir){
+ const hash=createHash('sha256');let count=0,total=0;
+ async function walk(folder,base=''){for(const item of (await readdir(folder,{withFileTypes:true})).sort((a,b)=>a.name<b.name?-1:a.name>b.name?1:0)){const rel=base+item.name;if(item.name.startsWith('.'))continue;if(item.isSymbolicLink())throw Error('Symlink in site');if(item.isDirectory())await walk(path.join(folder,item.name),rel+'/');else if(item.isFile()){const file=path.join(folder,item.name);const size=(await stat(file)).size;if(++count>1500||(total+=size)>80*1024*1024)throw Error('Site hash exceeds limits');hash.update(JSON.stringify([rel,size])+'\n');hash.update(await readFile(file))}}}
+ await walk(await realpath(dir));return hash.digest('hex');
+}
+const evidence={version:1,side:'web',adapter:'Playwright Chromium',targetSha256:await hashSite(root),contractSha256:await contractDigest(contract),cases};
 await writeFile(output,JSON.stringify(evidence,null,2),{flag:'wx'});
 if(cases.some(c=>c.error||c.steps.some(s=>!s.ok)))process.exitCode=1;
