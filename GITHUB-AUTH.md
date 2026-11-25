@@ -1,10 +1,17 @@
-# GitHub Sign-In Setup
+# GitHub Sign-In (GitHub Pages + Supabase Auth)
 
-REAlity now uses the normal OAuth authorization-code flow with PKCE. The GitHub authorization page reuses an existing GitHub login where possible. It does not read cross-origin cookies. Authorization remains explicit.
+REAlity is hosted on GitHub Pages. No Vercel deployment is used or required. A website cannot read GitHub's cross-origin login cookie. GitHub's OAuth authorization page can reuse an existing GitHub session and request explicit application authorization.
 
-1. Register an OAuth App at https://github.com/settings/applications/new. Name: REAlity. Homepage: https://marcusdhaynes.github.io/REAlity/. Authorization callback: https://marcusdhaynes.github.io/REAlity/.
-2. Deploy the standalone oauth-relay directory on Vercel (project root: oauth-relay). Configure GITHUB_OAUTH_CLIENT_ID and GITHUB_OAUTH_CLIENT_SECRET as production environment variables directly in the hosting dashboard. Never put the secret in GitHub, browser code, or chat. Redeploy after setting the variables.
-3. Set docs/auth-config.json relay to the verified HTTPS endpoint ending /api/github-oauth. Deploy Pages. The endpoint accepts only the configured Pages origin and fixed callback; its GET response exposes only the public client ID and callback. Enable hosting rate limiting and monitor errors.
-4. Open REAlity and select Continue With GitHub. The callback checks state and PKCE, verifies /user, and displays the account. Access tokens remain in browser memory and are cleared on disconnect or refresh. Start sign-in before loading files; full-page redirects reset unsaved work. Review public_repo and workflow permissions in GitHub. Revoke access in GitHub settings if needed.
+## One-time administrator setup
 
-The relay is committed but not deployed/configured. Until then the standard sign-in button reports that OAuth is unavailable. The optional scoped publishing token path remains separate. No password or client secret is requested in the browser.
+1. Create a dedicated REAlity Supabase project (do not reuse unrelated applications' projects). Note the project URL and publishable key.
+2. In GitHub, register a new OAuth application at https://github.com/settings/applications/new. Homepage: https://marcusdhaynes.github.io/REAlity/. Authorization callback: the exact GitHub provider callback shown in the project's Supabase Authentication settings (normally https://PROJECT_REF.supabase.co/auth/v1/callback).
+3. Enable the GitHub provider in that project's Supabase Authentication settings. Enter the OAuth client ID and client secret directly in the Supabase dashboard; never commit the secret to GitHub.
+4. Set the Supabase Site URL and allowed redirect URL to https://marcusdhaynes.github.io/REAlity/. Use exact URLs rather than wildcards.
+5. Update docs/auth-config.json with the project URL and modern sb_publishable_ key. Never include a service-role or secret API key. Deploy GitHub Pages using the existing Actions workflow.
+6. Select Continue With GitHub. Supabase's PKCE OAuth flow reuses the existing GitHub session if available. Review GitHub's public_repo and workflow permissions. The callback exchanges the code using a tab-local verifier and verifies the returned GitHub provider token against GitHub's /user endpoint.
+7. Sign in before selecting files because OAuth redirects reset the unsaved workbench. The GitHub token stays in browser memory, not persistent storage. Disconnect clears the local token; revoke the authorization in GitHub if desired.
+
+The project-specific provider configuration must be completed before live login can work. The scoped GitHub token fallback remains available. The optional self-hosted device flow is separate and not required for Supabase login.
+
+Official setup: https://supabase.com/docs/guides/auth/social-sign-in/auth-github
