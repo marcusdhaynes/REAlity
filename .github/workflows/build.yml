@@ -1,0 +1,36 @@
+name: REAlity CI and Windows build
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  tests:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest -v
+      - run: python -m compileall recovery.py desktop.py
+  windows-exe:
+    needs: tests
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pyinstaller==6.11.1
+      - run: python -m PyInstaller --clean --noconfirm --onefile --windowed --name REAlity desktop.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: REAlity-Windows
+          path: dist/REAlity.exe
+          if-no-files-found: error
