@@ -1,5 +1,5 @@
 """REAlity desktop interface."""
-import queue, threading, tkinter as tk, webbrowser
+import queue, threading, tkinter as tk, webbrowser, sys
 from pathlib import Path
 from tkinter import ttk, filedialog, messagebox
 from recovery import recover, locate, TOOLS
@@ -51,10 +51,14 @@ def main():
         p=Path(output.get()).resolve()
         if p.is_dir():webbrowser.open(p.as_uri())
         else:messagebox.showinfo('Workspace','No workspace created yet.')
+    def offline():
+        html=Path(getattr(sys,'_MEIPASS',Path(__file__).resolve().parent))/'REAlity-Offline.html'
+        if html.is_file():webbrowser.open(html.as_uri())
+        else:messagebox.showerror('Offline Inspector','Bundled inspector is missing.')
     def close():
         if busy:messagebox.showinfo('Recovery running','Wait for recovery to finish before closing.');return
         root.destroy()
-    go=ttk.Button(bar,text='Begin Recovery',command=start);go.pack(side='left');ttk.Button(bar,text='Check Engines',command=doctor).pack(side='left',padx=5);ttk.Button(bar,text='Open Workspace',command=openout).pack(side='left',padx=5);ttk.Button(bar,text='Craft Anything',command=lambda:webbrowser.open('https://github.com/storytold/craft-anything/releases/latest')).pack(side='left',padx=5)
+    go=ttk.Button(bar,text='Begin Recovery',command=start);go.pack(side='left');ttk.Button(bar,text='Check Engines',command=doctor).pack(side='left',padx=5);ttk.Button(bar,text='Open Workspace',command=openout).pack(side='left',padx=5);ttk.Button(bar,text='Offline Inspector',command=offline).pack(side='left',padx=5);ttk.Button(bar,text='Craft Anything',command=lambda:webbrowser.open('https://github.com/storytold/craft-anything/releases/latest')).pack(side='left',padx=5)
     progress=ttk.Progressbar(frame,mode='indeterminate');progress.grid(row=9,column=0,sticky='ew',pady=6);ttk.Label(frame,textvariable=status,wraplength=720).grid(row=10,column=0,sticky='w',pady=5)
     log=tk.Text(frame,bg='#191424',fg='#d6c9eb',insertbackground='white',font=('Consolas',10),wrap='word',relief='flat',padx=10,pady=10);log.grid(row=11,column=0,sticky='nsew');log.insert('end','Select an EXE or the complete installation directory. All recovered files are kept in a separate workspace.\n');root.protocol('WM_DELETE_WINDOW',close);root.after(100,tick);root.mainloop()
 if __name__=='__main__':main()
