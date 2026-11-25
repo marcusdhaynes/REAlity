@@ -2,6 +2,7 @@
 import argparse, hashlib, json, os, re, shutil, stat, struct, subprocess, zipfile
 from datetime import datetime, timezone
 from pathlib import Path
+from embedded import extract_asar, recover_sourcemap
 MAX_FILES=20000
 MAX_EXPAND=4*1024**3
 MAX_DEPTH=3
@@ -145,6 +146,24 @@ def recover(target,out,external=False,emit=print):
                 except Exception as e:report['warnings'].append(f'{p.name}: {e}');shutil.rmtree(d,ignore_errors=True)
             elif zipfile.is_zipfile(p):report['warnings'].append('Nested archive depth limit: '+p.name)
             ext=p.suffix.lower(); rel=p.relative_to(out)
+            if ext=='.asar' and depth<MAX_DEPTH:
+                d=out/'Extracted'/f'{j:05d}-asar'
+                try:
+                    warnings=extract_asar(p,d,budget,MAX_FILES,MAX_EXPAND)
+                    report['warnings'].extend(f'{p.name}: {w}' for w in warnings)
+                    roots.extend((q,depth+1) for q in walk(d));emit('Extracted packed ASAR '+p.name)
+                except Exception as e:
+                    report['warnings'].append(f'{p.name}: {e}');shutil.rmtree(d,ignore_errors=True)
+            elif ext=='.asar':report['warnings'].append('ASAR depth limit: '+p.name)
+            if ext=='.map':
+                d=out/'Source'/f'{j:05d}-embedded-sources'
+                try:
+                    result=recover_sourcemap(p,d,budget,MAX_FILES,MAX_EXPAND)
+                    report.setdefault('source_maps',[]).append({'origin':str(rel),'output':str(d.relative_to(out)),**result})
+                    for item in result['recovered']:
+                        f=d/item['file'];report['files'].append({'path':str(f.relative_to(out)),'sha256':hashfile(f),'kind':'embedded source map text','origin':str(rel),'source_name':item['original_source']})
+                except Exception as e:
+                    report['warnings'].append(f'{p.name}: {e}');shutil.rmtree(d,ignore_errors=True)
             if ext in SOURCE or ext in ASSETS or ext in {'.dll','.so','.dylib','.lib','.pdb','.jar'}:
                 cat='Source' if ext in SOURCE else 'Assets' if ext in ASSETS else 'Dependencies'; d=out/cat/rel;d.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(p,d)
                 report['files'].append({'path':str(d.relative_to(out)),'sha256':hashfile(d),'kind':'copied candidate','origin':str(rel)})
@@ -156,7 +175,7 @@ def recover(target,out,external=False,emit=print):
                 d=out/'Source'/('decompiled-'+tag);d.mkdir();jobs.append(('ilspy',['-p','-o',str(d),str(p)]))
             elif meta['format']=='PE':jobs.append(('rea',['analyze',str(p),'--provider','ghidra','--json']))
             if ext=='.asar':
-                d=out/'Extracted'/('asar-'+tag);d.mkdir();jobs.extend([('rea',['analyze-javascript-application',str(p),'--json']),('asar',['extract',str(p),str(d)])])
+                jobs.append(('rea',['analyze-javascript-application',str(p),'--json']))
             if ext in {'.apk','.jar'}:
                 d=out/'Source'/('jadx-'+tag);d.mkdir();jobs.append(('jadx',['-d',str(d),str(p)]))
             if any('PyInstaller' in m for m in meta['markers']):jobs.append(('pyinstxtractor',[str(p)]))
@@ -164,10 +183,6 @@ def recover(target,out,external=False,emit=print):
             for name,args in jobs:
                 if external:
                     emit('Running '+name+' on '+p.name);result=run_tool(name,args,out/'Analysis'/f'{tag}-{name}.log',out/'Extracted')
-                    if name=='asar' and result['status']=='completed':
-                        if depth<MAX_DEPTH:
-                            roots.extend((q,depth+1) for q in walk(Path(args[-1])))
-                        else:report['warnings'].append('ASAR depth limit: '+p.name)
                 else:result={'tool':name,'status':'not run (static mode)','arguments':args}
                 report['tools'].append(result)
             save()
